@@ -82,6 +82,13 @@ async function run() {
       res.send(result);
     });
 
+    //all user get
+    app.get("/user", async (req, res) => {
+      const query = {};
+      const result = await userCollection.find(query).toArray();
+      res.send(result);
+    });
+
     //post new order
     app.post("/order", async (req, res) => {
       const newOrder = req.body;
@@ -89,8 +96,18 @@ async function run() {
       res.send(result);
     });
 
-    // post profile info
+    // make admin
+    app.put("/user/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { role: "admin" },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
 
+    // post profile info
     app.put("/profile/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -141,6 +158,14 @@ async function run() {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    //user delete
+    app.delete("/user/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await userCollection.deleteOne(filter);
       res.send(result);
     });
   } finally {
