@@ -40,6 +40,7 @@ async function run() {
     const partsCollection = client.db("car-parts").collection("parts");
     const orderCollection = client.db("car-parts").collection("order");
     const userCollection = client.db("car-parts").collection("users");
+    const reviewsCollection = client.db("car-parts").collection("reviews");
 
     //login jwt
     app.put("/user/:email", async (req, res) => {
@@ -86,6 +87,53 @@ async function run() {
       const newOrder = req.body;
       const result = await orderCollection.insertOne(newOrder);
       res.send(result);
+    });
+
+    // post profile info
+
+    app.put("/profile/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          fullName: user.fullName,
+          image: user.image,
+          phoneNumber: user.phoneNumber,
+          addressLine1: user.addressLine1,
+          addressLine2: user.addressLine2,
+          city: user.city,
+          state: user.state,
+          postalCode: user.postalCode,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    // review add
+    app.post("/review/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const review = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          rating: review.rating,
+        },
+      };
+      const updateReview = await orderCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+
+      if (updateReview.acknowledged) {
+        const result = await reviewsCollection.insertOne(review);
+        return res.send(result);
+      }
+      return res.send({ message: "Review Faild" });
     });
 
     //delete order
