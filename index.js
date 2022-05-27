@@ -87,11 +87,15 @@ async function run() {
       res.send(result);
     });
 
-    //all orders get
-    app.get("/orderes-product/:email", async (req, res) => {
-      const email = req.params.email;
-      const query = { email: email };
-      const result = await orderCollection.find(query).toArray();
+    //get all orders
+    app.get("/all-order", async (req, res) => {
+      const result = await orderCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    //get all reviews
+    app.get("/all-reviews", async (req, res) => {
+      const result = await reviewsCollection.find({}).toArray();
       res.send(result);
     });
 
@@ -99,6 +103,12 @@ async function run() {
     app.get("/user", async (req, res) => {
       const query = {};
       const result = await userCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //get all orders
+    app.get("/all-order", async (req, res) => {
+      const result = await partsCollection.find({}).toArray();
       res.send(result);
     });
 
