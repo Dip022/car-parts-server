@@ -44,7 +44,7 @@ async function run() {
 
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
-      const requestAccount = await usersCollection.findOne({
+      const requestAccount = await userCollection.findOne({
         email: requester,
       });
 
@@ -139,6 +139,14 @@ async function run() {
         },
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    // add product post
+    app.post("/new-product", verifyJWT, verifyAdmin, async (req, res) => {
+      const newProduct = req.body;
+      console.log(newProduct);
+      const result = await partsCollection.insertOne(newProduct);
       res.send(result);
     });
 
