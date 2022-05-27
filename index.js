@@ -42,6 +42,19 @@ async function run() {
     const userCollection = client.db("car-parts").collection("users");
     const reviewsCollection = client.db("car-parts").collection("reviews");
 
+    const verifyAdmin = async (req, res, next) => {
+      const requester = req.decoded.email;
+      const requestAccount = await usersCollection.findOne({
+        email: requester,
+      });
+
+      if (requestAccount.role === "admin") {
+        next();
+      } else {
+        res.status(403).send({ message: "Forbidden access" });
+      }
+    };
+
     //login jwt
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -97,7 +110,7 @@ async function run() {
     });
 
     // make admin
-    app.put("/user/admin/:email", verifyJWT, async (req, res) => {
+    app.put("/user/admin/:email", verifyJWT, verifyAdmin, async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
       const updateDoc = {
@@ -166,6 +179,20 @@ async function run() {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await userCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    //part delete
+    app.delete("/part/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await partsCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    // all orders get
+    app.get("/all-order", async (req, res) => {
+      const result = await orderCollection.find({}).toArray();
       res.send(result);
     });
 
