@@ -93,6 +93,26 @@ async function run() {
       res.send(result);
     });
 
+    //get all orders
+    app.get("/orderes-product/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = {
+        email: email,
+      };
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //get all orders
+    app.get("/orderes-product/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = {
+        email: email,
+      };
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
+
     //get all reviews
     app.get("/all-reviews", async (req, res) => {
       const result = await reviewsCollection.find({}).toArray();
